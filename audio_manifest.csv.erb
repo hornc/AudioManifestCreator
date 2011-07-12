@@ -1,0 +1,9 @@
+<% @location = Dir.new("./") -%>
+<% Dir.chdir(@location.path) -%>
+Files located at: <%= @location.path %>
+Recording, Description, Location, Duration, Time, Date, Channels, Bits, Sample Rate, Format
+<% @location.sort.each do |f|
+  sample = WavInfo.new(f) if f.upcase.include?(".WAV")
+  sample = Mp3Info.new(f) if f.upcase.include?(".MP3") -%>
+<%= "#{sample.output_format}\n" if !sample.nil? -%>
+<% end -%>
