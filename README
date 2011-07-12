@@ -14,12 +14,12 @@ Based on two scripts I wrote in 2009 / 2010 to manage, preview, and capture the 
 
 
 manifest_csv.erb
-USAGE:
-erb -T "-" -r ./sample_info.rb manifest.csv.erb > test.csv
-
 manifest_index_html.erb
+
+Used by create_manifest.rb
 USAGE:
-erb -T "-" manifest_index.html.erb > test.html
+  ruby create_manifests.rb [./]
+
 
 sample_info.rb
 Analyzes an audio file and provides information about its length and format. Currently supports .wav and .mp3

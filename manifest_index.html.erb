@@ -1,25 +1,22 @@
-<html><head><title>Audio Manifest Index</title>
-
-<script language="JavaScript" type="text/javascript">
-<!-- // Javascript to create a popup window to play the audio files / separate window for link 
-function loadpage(url) {
-  myWindow = window.open ('', 'Audio', 'toolbar=0,titlebar=0,location=0,directories=0,status=0,menubar=0,scrollbars=auto,resizable=yes,width=400,height=400');
-  //window.blur();
-  myWindow.document.write("<html><title>Sample Player</title><body><embed src='"+url+"' height=100 width=350 />");
-  myWindow.document.write("<p>This file: "+url+"</p></body></html>");
-  myWindow.document.close();
-  if (window.focus) {myWindow.focus()}
-}
-// --> </script>
-
-</head>
+<html>
+  <head>
+    <title>Audio Manifest Index</title>
+    <script language="JavaScript" type="text/javascript">
+      <!-- // Javascript to create a popup window to play the audio files / separate window for link 
+        function loadpage(url) {
+          myWindow = window.open ('', 'Audio', 'toolbar=0,titlebar=0,location=0,directories=0,status=0,menubar=0,scrollbars=auto,resizable=yes,width=400,height=400');
+          myWindow.document.write("<html><head><title>Sample Player</title></head><body><embed src='"+url+"' height=100 width=350 />");
+          myWindow.document.write("<p>This file: "+url+"</p></body></html>");
+          myWindow.document.close();
+          if (window.focus) {myWindow.focus()}
+        }
+      // --> 
+    </script>
+  </head>
 <body>
-
 <% main_dir = "./" -%>
-
-<h3>This Manifest Index Created: <pre><%= Time.now.inspect %></pre></h3>
-<h3>From the sub-directories of: <pre><%= main_dir %></pre></h3>
-
+  <h3>This Manifest Index Created: <pre><%= Time.now.inspect %></pre></h3>
+  <h3>From the sub-directories of: <pre><%= main_dir %></pre></h3>
 <% d = Dir.new(main_dir).sort -%>
 
 <!-- Contents Section -->
@@ -76,4 +73,5 @@ function loadpage(url) {
    <% end
   end
 end -%>
-</body></html>
+  </body>
+</html>
