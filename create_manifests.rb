@@ -1,5 +1,6 @@
 $LOAD_PATH << "#{File.dirname($0)}/"
 require "sample_info"
+require "audio_dir"
 require "erb"
 require 'ostruct'
 
@@ -8,50 +9,40 @@ require 'ostruct'
 #   ruby create_manifests.rb [./]
 #
 
-def generate_index(dir)
+def generate_index(location, directories)
   index_template = ERB.new File.new("#{File.dirname($0)}/manifest_index.html.erb").read, nil, "-"
-  vars = OpenStruct.new :location => location, :manifests => manifests
+  vars = OpenStruct.new :location => location, :directories => directories
   doc = index_template.result(vars.send(:binding))
 end
 
-def generate_csv(dir)
-  manifest_template = ERB.new File.new("#{File.dirname($0)}/audio_manifest.csv.erb").read, nil, "-"
-  samples = []
-  location = Dir.new(dir)
-  location.sort.each do |f|
-    samples << WavInfo.new("#{dir}/#{f}") if f.upcase.include?(".WAV")
-    samples << Mp3Info.new("#{dir}/#{f}") if f.upcase.include?(".MP3")
-  end
-  vars = OpenStruct.new :location => location, :samples => samples
-  doc = manifest_template.result(vars.send(:binding))
-  manifest_name = "#{dir}/#{dir}_manifest.csv"
-  if !File.exist?(manifest_name)
-    if File.open(manifest_name, 'w') {|f| f.write(doc) }
-      puts "Created #{manifest_name}!"
-    end
-  end
-end
-
-if ARGV[0].nil?
+if ARGV[0].nil? || !File.directory?(ARGV[0])
   location = Dir.new("./")
 else
   location = Dir.new(ARGV[0])
 end
 
-# Get list of sub directories
-sub_dirs = ["./"]
+# Get list of sub directories (that contain audio files)
+audio_dirs = [AudioDir.new("./")]
+audio_files = /.*mp3|.*wav/
 location.each do |x|
-  sub_dirs << x if File.directory?(x) && x[0] != "."
+  if File.directory?(x) && x[0] != "."
+    audio_dirs << AudioDir.new(x, audio_files)
+    audio_dirs.pop if !audio_dirs.last.has_samples?
+  end
 end
 
 # Check each sub dir for presence of a .csv manifest, otherwise create it.
-sub_dirs.each do |sub|
-  has_csv = false
-  Dir.new(sub).each do |f|
-    has_csv = true if File.file?("#{sub}/#{f}") && f.end_with?(".csv")
+audio_dirs.each do |d|
+  d.sample_match = /.*mp3|.*wav/   # set the pattern of samples we are interested in
+  if d.has_manifest?
+    puts "Found CSV manifest in #{d.path} ... skipping."
+  else
+    filename = "#{d.path}/#{d.manifest}"
+    if File.open(filename, 'w') {|f| f.write(d.generate_manifest) }
+      puts "Created #{filename}!"
+    end
   end
-  puts "Found CSV manifest in #{sub} ... skipping." if has_csv
-  generate_csv("#{sub}") if !has_csv
 end
 
+puts generate_index(location, audio_dirs)
 

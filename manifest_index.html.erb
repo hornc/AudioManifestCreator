@@ -14,51 +14,39 @@
     </script>
   </head>
 <body>
-<% main_dir = "./" -%>
   <h3>This Manifest Index Created: <pre><%= Time.now.inspect %></pre></h3>
-  <h3>From the sub-directories of: <pre><%= main_dir %></pre></h3>
-<% d = Dir.new(main_dir).sort -%>
+  <h3>From the sub-directories of: <pre><%= location %></pre></h3>
 
 <!-- Contents Section -->
-<h2>Contents:</h2><ul>
-<% d.each do |dir|
-    if (dir != "..") && File.directory?("#{main_dir}/#{dir}") -%>
-      <li><a href='#<%= dir %>'><%= dir %></a></li>
-    <% end
-   end -%>
+<h2>Contents:</h2>
+<ul>
+<% directories.each do |dir| -%>
+  <li><a href='#<%= dir.path %>'><%= dir.path %></a></li>
+<% end -%>
 </ul>
 
 
 <!-- For each Manifest list contents -->
-<% d.each do |dir|
-  if (dir != "..") && File.directory?("#{main_dir}/#{dir}")
-    full_dir_path = "#{main_dir}#{dir}"
-    d2 = Dir.new(full_dir_path)
-    d2.each do |filename|
-      # For each non hidden .csv file in the directory, output its contents as html 
-      next if !filename.end_with?(".csv") || filename[0]=="."
-      filename =  "#{full_dir_path}/#{filename}"
-      f = File.new(filename, "r")
-      this_dir = File.dirname(filename)
-      dir_name = File.basename(this_dir) -%>
-
-<h3><a name='#<%= dir_name %>'><%= dir_name %></a></h3>
-<b>Location:</b> <a href='<%= this_dir %>'><%= this_dir %></a><br/>
-<b>Manifest:</b> <a href='<%= filename %>'><%= File.basename(filename) %></a></br>
-<b>Manifest Last Modified:</b> <%= f.mtime %>
+<% directories.each do |dir| -%>
+  <% full_manifest_path = "#{dir.path}/#{dir.manifest}" -%>
+<h3><a name='#<%= dir.path %>'><%= dir.path %></a></h3>
+<b>Location:</b> <a href='<%= dir.path %>'><%= dir.path %></a><br/>
+<b>Manifest:</b> <a href='<%= full_manifest_path %>'><%= dir.manifest %></a></br>
+<b>Manifest Last Modified:</b> <%= File.mtime(full_manifest_path) %>
+  <% f = File.new(full_manifest_path) -%>
 <table border=1>
-   <% f.each do |line|
-        header = false
-        column = 0
-        line = line + ","
-        # If the current line starts with "Recording, Description," then it is a header row 
-        header = true if line.start_with?("Recording, Description,") -%>
+  <% f.each do |line|
+    header = false
+    column = 0
+    line = line + ","
+    # If the current line starts with "Recording, Description," then it is a header row 
+    header = true if line.start_with?("Recording, Description,") -%>
   <tr>
-     <% sample_info = line.scan(/(".*?"|[^,]*),/)
+    <% sample_info = line.scan(/(".*?"|[^,]*),/)
         sample_info.each do |x|
           if header -%><th><% else -%><td><% end -%>
           <% if column == 0 && !header && !sample_info[9].nil? -%>
-<a href="javascript:loadpage('<%= "#{this_dir}/#{x[0]}.#{sample_info[9][0].strip.downcase}"-%>');"><%= x[0] -%></a>
+<a href="javascript:loadpage('<%= "#{dir.path}/#{x[0]}.#{sample_info[9][0].strip.downcase}"-%>');"><%= x[0] -%></a>
           <% else -%>
 <%= x[0] -%>
           <% end -%>       
@@ -70,8 +58,6 @@
   </tr>
    <% end -%>
 </table>
-   <% end
-  end
-end -%>
+<% end -%>
   </body>
 </html>
