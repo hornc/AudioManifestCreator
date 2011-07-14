@@ -1,6 +1,6 @@
 class SampleInfo
   attr_reader  :filename, :id, :creation_time, :creation_date, :file_format,
-    :channels, :sample_rate, :bit_rate, :bits_per_sample, :duration
+    :channels, :sample_rate, :bit_rate, :bits_per_sample, :bits, :duration
 
   def initialize(filename)
     file_found = File.exists?(filename)
@@ -22,9 +22,11 @@ class SampleInfo
 # Sample Output format:
 # Sample Name, Description, Location, Duration, Time, Date, Channels, Bitrate / BitsPerSample, Sample Rate, Format"
   def output_format
-    bits = bit_rate if file_format == "MP3"
-    bits = bits_per_sample if file_format == "WAV"
     [id, "", "", duration, creation_time, creation_date, channels, bits, sample_rate, file_format].join(",")
+  end
+
+  def info
+    Hash["Id" => id, "Description" => "", "Location" => "", "Duration" => duration, "Time" => creation_time, "Date" => creation_date, "Channels" => channels, "Bits" => bits, "Samplerate" => sample_rate, "Format" => file_format] 
   end
 
   def debug_output
@@ -62,6 +64,7 @@ class WavInfo < SampleInfo
         end
       end
     end
+    @bits = @bits_per_sample
   end
 
   private	
@@ -134,6 +137,7 @@ class Mp3Info < SampleInfo
       @channels = channels
       @sample_rate = frequency
       @bit_rate = "#{bitrate}kb/s"
+      @bits = @bit_rate
     end  
    end
   

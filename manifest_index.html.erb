@@ -12,10 +12,15 @@
         }
       // --> 
     </script>
+    <style type="text/css">
+      table, td, th { 
+        border: 1px solid black;
+     }
+    </style>
   </head>
 <body>
-  <h3>This Manifest Index Created: <pre><%= Time.now.inspect %></pre></h3>
-  <h3>From the sub-directories of: <pre><%= location %></pre></h3>
+<h3>This Manifest Index Created: <pre><%= Time.now.inspect %></pre></h3>
+<h3>From the sub-directories of: <pre><%= location.path %></pre></h3>
 
 <!-- Contents Section -->
 <h2>Contents:</h2>
@@ -25,39 +30,29 @@
 <% end -%>
 </ul>
 
-
-<!-- For each Manifest list contents -->
+<!-- For each Audio Directory, list manifest contents -->
 <% directories.each do |dir| -%>
   <% full_manifest_path = "#{dir.path}/#{dir.manifest}" -%>
 <h3><a name='#<%= dir.path %>'><%= dir.path %></a></h3>
-<b>Location:</b> <a href='<%= dir.path %>'><%= dir.path %></a><br/>
-<b>Manifest:</b> <a href='<%= full_manifest_path %>'><%= dir.manifest %></a></br>
-<b>Manifest Last Modified:</b> <%= File.mtime(full_manifest_path) %>
-  <% f = File.new(full_manifest_path) -%>
-<table border=1>
-  <% f.each do |line|
-    header = false
-    column = 0
-    line = line + ","
-    # If the current line starts with "Recording, Description," then it is a header row 
-    header = true if line.start_with?("Recording, Description,") -%>
-  <tr>
-    <% sample_info = line.scan(/(".*?"|[^,]*),/)
-        sample_info.each do |x|
-          if header -%><th><% else -%><td><% end -%>
-          <% if column == 0 && !header && !sample_info[9].nil? -%>
-<a href="javascript:loadpage('<%= "#{dir.path}/#{x[0]}.#{sample_info[9][0].strip.downcase}"-%>');"><%= x[0] -%></a>
-          <% else -%>
-<%= x[0] -%>
-          <% end -%>       
-       <% if header -%>
-</th><% else -%>
-</td><% end -%>
-       <% column += 1
-        end -%>
-  </tr>
-   <% end -%>
+  <b>Location:</b> <a href='<%= dir.path %>'><%= dir.path %></a><br/>
+  <b>Manifest:</b> <a href='<%= full_manifest_path %>'><%= dir.manifest %></a><br/>
+  <b>Manifest Last Modified:</b> <%= File.mtime(full_manifest_path) %>
+  <table>
+    <tr>
+      <% dir.sample_headers.each {|h| -%><th><%= h -%></th><% } %>
+    </tr>
+    <%- dir.sample_info.each do |s| -%>
+    <tr>
+    <%- s.each_pair do |key, value| -%>
+      <%- if key == "Id" -%>
+        <td><a href="javascript:loadpage('<%= "#{dir.path}/#{s["Id"]}.#{s["Format"].strip.downcase}"-%>');"><%= s["Id"] -%></a></td>
+      <%- else -%>
+        <td><%= value -%></td>
+      <%- end -%>
+    <%- end -%>
+    </tr>
+  <%- end -%>
 </table>
 <% end -%>
-  </body>
+</body>
 </html>

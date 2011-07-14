@@ -41,6 +41,20 @@ class AudioDir < Dir
     self.samples.length != 0
   end
 
+  def sample_headers
+    ["Recording", "Description", "Location", "Duration", "Time", "Date", "Channels", "Bits", "Sample Rate", "Format"]
+  end
+
+  def sample_info
+    samples = []
+    self.samples.each do |s|
+      s = "#{self.path}/#{s}"
+      samples << WavInfo.new(s).info if s.upcase.include?(".WAV")
+      samples << Mp3Info.new(s).info if s.upcase.include?(".MP3")
+    end
+    samples  
+  end
+
   def generate_manifest
     manifest_template = ERB.new File.new("#{Dir.getwd}/audio_manifest.csv.erb").read, nil, "-"
     samples = []

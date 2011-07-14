@@ -22,8 +22,8 @@ else
 end
 
 # Get list of sub directories (that contain audio files)
-audio_dirs = [AudioDir.new("./")]
-audio_files = /.*mp3|.*wav/
+audio_dirs = [AudioDir.new(location)]
+audio_files = /.*mp3|.*wav/ # set the pattern of samples we are interested in
 location.each do |x|
   if File.directory?(x) && x[0] != "."
     audio_dirs << AudioDir.new(x, audio_files)
@@ -31,9 +31,8 @@ location.each do |x|
   end
 end
 
-# Check each sub dir for presence of a .csv manifest, otherwise create it.
+# Check each Audio directory for presence of a .csv manifest, otherwise generate it.
 audio_dirs.each do |d|
-  d.sample_match = /.*mp3|.*wav/   # set the pattern of samples we are interested in
   if d.has_manifest?
     puts "Found CSV manifest in #{d.path} ... skipping."
   else
@@ -44,5 +43,8 @@ audio_dirs.each do |d|
   end
 end
 
-puts generate_index(location, audio_dirs)
+if File.open("#{location.path}/index.html", 'w') {|f| f.write(generate_index(location, audio_dirs)) }
+  puts "Created #{location.path}/index.html "
+end
+ 
 
