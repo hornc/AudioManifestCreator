@@ -26,7 +26,7 @@ Dir.chdir(location.path)
 
 # Get list of sub directories (that contain audio files)
 audio_dirs = []
-audio_files = /.*mp3|.*wav|.*mp4/ # set the pattern of samples we are interested in
+audio_files = /mp3$|wav$|mp4$|au$/ # set the pattern of samples we are interested in
 location.each do |x|
   if File.directory?(x) && x != ".."
     audio_dirs << AudioDir.new(x, audio_files)
