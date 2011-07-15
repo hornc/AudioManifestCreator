@@ -13,18 +13,23 @@
       // --> 
     </script>
     <style type="text/css">
-      table, td, th { 
-        border: 1px solid black;
+     h1, h2, h3, b, td.id, .contents, th { 
+       font-family: "sans-serif"; 
      }
+     th { background: #aab; }
+     td.id { text-align: right; } 
+     td.empty { background: #fdd; }
+     tr.odd td.empty { background: #ebb; }
+     tr.odd { background: #dde; }
     </style>
   </head>
 <body>
-<h3>This Manifest Index Created: <pre><%= Time.now.inspect %></pre></h3>
-<h3>From the sub-directories of: <pre><%= location.path %></pre></h3>
+<h3>This Audio Manifest Index Created: <%= Time.now.inspect %></h3>
+<h3>from the sub-directories of: <%= location.path %></h3>
 
 <!-- Contents Section -->
 <h2>Contents:</h2>
-<ul>
+<ul class="contents">
 <% directories.each do |dir| -%>
   <li><a href='#<%= dir.path %>'><%= dir.path %></a></li>
 <% end -%>
@@ -33,7 +38,7 @@
 <!-- For each Audio Directory, list manifest contents -->
 <% directories.each do |dir| -%>
   <%- full_manifest_path = "#{dir.path}/#{dir.manifest}" -%>
-  <h3><a name='#<%= dir.path %>'><%= dir.path %></a></h3>
+  <h3><a name='<%= dir.path %>'><%= dir.path %></a></h3>
   <b>Location:</b> <a href='<%= dir.path %>'><%= dir.path %></a><br/>
   <b>Manifest:</b> <a href='<%= full_manifest_path %>'><%= dir.manifest %></a><br/>
   <b>Manifest Last Modified:</b> <%= File.mtime(full_manifest_path) %>
@@ -41,13 +46,15 @@
     <tr>
       <% dir.sample_headers.each {|h| -%><th><%= h -%></th><% } %>
     </tr>
+    <%- count = 1 -%>
     <%- dir.sample_info.each do |s| -%>
-    <tr>
+    <tr class="<%= count % 2 == 1 ? "odd" : "even" -%>">
+    <%- count += 1 -%>
     <%- s.each_pair do |key, value| -%>
       <%- if key == "Id" -%>
-        <td><a href="javascript:loadpage('<%= s["Filename"]-%>');"><%= s["Id"] -%></a></td>
+        <td class="id"><a href="javascript:loadpage('<%= s["Filename"]-%>');"><%= s["Id"] -%></a></td>
       <%- elsif key != "Filename" -%>
-        <td><%= value -%></td>
+        <td <%= "class=\"empty\"" if value=="" -%> ><%= value -%></td>
       <%- end -%>
     <%- end -%>
     </tr>
