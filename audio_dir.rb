@@ -5,7 +5,7 @@ require 'ostruct'
 class AudioDir < Dir
   attr_accessor :sample_match, :manifest
 
-  def initialize(name, sample_match=/.*mp3|.*wav/)
+  def initialize(name, sample_match=/.mp3$|.wav$/)
     super(name)
     has_manifest?
     @sample_match = sample_match
@@ -52,8 +52,7 @@ class AudioDir < Dir
     samples = []  # Array of sample info hashes
     self.samples.each do |s|
       s = "#{self.path}/#{s}"
-      samples << WavInfo.new(s).info if s.upcase.include?(".WAV")
-      samples << Mp3Info.new(s).info if s.upcase.include?(".MP3")
+      samples << SampleInfo.create(s).info
     end
     sample_ids = Hash.new
     samples.each {|s| sample_ids[s["Id"]] = s["Filename"]} 
@@ -81,8 +80,7 @@ class AudioDir < Dir
     samples = []
     self.samples.each do |s|
       s = "#{self.path}/#{s}"
-      samples << WavInfo.new(s) if s.upcase.include?(".WAV")
-      samples << Mp3Info.new(s) if s.upcase.include?(".MP3")
+      samples << SampleInfo.create(s)
     end
     location = self
     vars = OpenStruct.new :location => location, :samples => samples
