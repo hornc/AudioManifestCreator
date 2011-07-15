@@ -15,6 +15,17 @@ class SampleInfo
     file_found
   end
 
+  def self.create(filename)
+    case filename.downcase
+    when /.wav$/
+      WavInfo.new(filename)
+    when /.mp3$/
+      Mp3Info.new(filename)
+    else
+      SampleInfo.new(filename)
+    end
+  end
+
   # Formats seconds to MM:SS.000
   def seconds_to_duration(secs)
     "#{Time.at(secs).strftime("%M:%S")}#{secs.to_s.match('\..{3}')}"
