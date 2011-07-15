@@ -6,6 +6,7 @@ class SampleInfo
     file_found = File.exists?(filename)
     @filename = filename
     @id = File.basename(filename).sub(/\.[^\.]*$/,"") # tidied name of sample, with file extension removed
+    @id = @id.sub(/^R09_0*/,"")    # remove Edirol standard prefix from file name, to make customisable at some point
     if file_found
       recording_time = File.mtime(filename)
       @creation_time = recording_time.strftime("%H:%M:%S")
