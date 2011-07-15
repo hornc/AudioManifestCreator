@@ -5,7 +5,7 @@ class SampleInfo
   def initialize(filename)
     file_found = File.exists?(filename)
     @filename = filename
-    @id = File.basename(filename, ".#{@file_format.downcase}") # tidied name of sample
+    @id = File.basename(filename).sub(/\.[^\.]*$/,"") # tidied name of sample, with file extension removed
     if file_found
       recording_time = File.mtime(filename)
       @creation_time = recording_time.strftime("%H:%M:%S")
@@ -26,7 +26,7 @@ class SampleInfo
   end
 
   def info
-    Hash["Id" => id, "Description" => "", "Location" => "", "Duration" => duration, "Time" => creation_time, "Date" => creation_date, "Channels" => channels, "Bits" => bits, "Samplerate" => sample_rate, "Format" => file_format] 
+    Hash["Filename" => filename, "Id" => id, "Description" => "", "Location" => "", "Duration" => duration, "Time" => creation_time, "Date" => creation_date, "Channels" => channels, "Bits" => bits, "Samplerate" => sample_rate, "Format" => file_format] 
   end
 
   def debug_output

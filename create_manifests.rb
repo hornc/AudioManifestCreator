@@ -1,4 +1,5 @@
-$LOAD_PATH << "#{File.dirname($0)}/"
+SCRIPT_LOCATION = "#{File.expand_path(File.dirname(__FILE__))}/"
+$LOAD_PATH << SCRIPT_LOCATION
 require "sample_info"
 require "audio_dir"
 require "erb"
@@ -10,7 +11,7 @@ require 'ostruct'
 #
 
 def generate_index(location, directories)
-  index_template = ERB.new File.new("#{File.dirname($0)}/manifest_index.html.erb").read, nil, "-"
+  index_template = ERB.new File.new("#{SCRIPT_LOCATION}/manifest_index.html.erb").read, nil, "-"
   vars = OpenStruct.new :location => location, :directories => directories
   doc = index_template.result(vars.send(:binding))
 end
@@ -21,11 +22,13 @@ else
   location = Dir.new(ARGV[0])
 end
 
+Dir.chdir(location.path)
+
 # Get list of sub directories (that contain audio files)
-audio_dirs = [AudioDir.new(location)]
-audio_files = /.*mp3|.*wav/ # set the pattern of samples we are interested in
+audio_dirs = []
+audio_files = /.*mp3|.*wav|.*mp4/ # set the pattern of samples we are interested in
 location.each do |x|
-  if File.directory?(x) && x[0] != "."
+  if File.directory?(x) && x != ".."
     audio_dirs << AudioDir.new(x, audio_files)
     audio_dirs.pop if !audio_dirs.last.has_samples?
   end
@@ -43,6 +46,9 @@ audio_dirs.each do |d|
   end
 end
 
+puts "Location: #{location.path}"
+
+# Create overall manifest index for the range of audio directories under the specified directory
 if File.open("#{location.path}/index.html", 'w') {|f| f.write(generate_index(location, audio_dirs)) }
   puts "Created #{location.path}/index.html "
 end

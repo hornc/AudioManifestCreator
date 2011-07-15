@@ -7,6 +7,7 @@ class AudioDir < Dir
 
   def initialize(name, sample_match=/.*mp3|.*wav/)
     super(name)
+    has_manifest?
     @sample_match = sample_match
   end
 
@@ -25,14 +26,16 @@ class AudioDir < Dir
     if self.has_manifest?
       @manifest
     else
-      "#{self.path}_manifest.csv"
+      if self.path == "." then name = "main" else name = self.path end
+      "#{name}_manifest.csv"
     end
   end
 
   def samples
     output = []
-    self.each do |s|
-      output << s if s.match(sample_match)
+    self.sort.each do |s|
+      # s = "#{self.path}/#{s}"
+      output << s if s.downcase.match(sample_match)
     end
     output
   end
@@ -46,17 +49,35 @@ class AudioDir < Dir
   end
 
   def sample_info
-    samples = []
+    samples = []  # Array of sample info hashes
     self.samples.each do |s|
       s = "#{self.path}/#{s}"
       samples << WavInfo.new(s).info if s.upcase.include?(".WAV")
       samples << Mp3Info.new(s).info if s.upcase.include?(".MP3")
     end
+    sample_ids = Hash.new
+    samples.each {|s| sample_ids[s["Id"]] = s["Filename"]} 
+
+    # Read manifest and output sample information, getting filenames from the acutal directory, Descriptions and Locations from the manifest file
+    f = File.new("#{self.path}/#{@manifest}","r")
+    puts "reading manifest source: #{f.path}"
+    f.each do |l|
+        a = l.scan(/([^,"]*|".*?"),/)
+        a.each_index do |i|
+          next if a[i].class != Array
+          a[i] = a[i][0]
+          a[i] = a[i][1..-2] if a[i][0] == "\"" && a[i][-1] == "\""
+        end 
+       if sample_ids.has_key?(a[0])
+          samples[samples.index{|x| x["Id"] == a[0]}]["Description"] = a[1] if !a[1].nil?
+          samples[samples.index{|x| x["Id"] == a[0]}]["Location"] = a[2] if !a[2].nil?
+       end
+    end
     samples  
   end
 
   def generate_manifest
-    manifest_template = ERB.new File.new("#{Dir.getwd}/audio_manifest.csv.erb").read, nil, "-"
+    manifest_template = ERB.new File.new("#{File.expand_path(File.dirname(__FILE__))}/audio_manifest.csv.erb").read, nil, "-"
     samples = []
     self.samples.each do |s|
       s = "#{self.path}/#{s}"
