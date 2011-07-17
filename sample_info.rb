@@ -28,7 +28,8 @@ class SampleInfo
 
   # Formats seconds to MM:SS.000
   def seconds_to_duration(secs)
-    "#{Time.at(secs).strftime("%M:%S")}#{secs.to_s.match('\..{3}')}"
+    hours = "#{(secs/3600).to_i}:" if secs >= 3600
+    "#{hours}#{Time.at(secs).strftime("%M:%S")}#{secs.to_s.match('\..{3}')}"
   end
 
 # Sample Output format:
