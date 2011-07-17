@@ -86,5 +86,21 @@ class AudioDir < Dir
     vars = OpenStruct.new :location => location, :samples => samples
     doc = manifest_template.result(vars.send(:binding))
   end
+  
+  def playlist
+    "samples.pls"
+  end
+
+  def generate_playlist
+    output = "[playlist]\n"
+    count = 0
+    sample_info.each do |s|
+      count += 1
+      output += "File#{count}=#{File.basename(s["Filename"])}\n"
+      output += "Title#{count}=#{s["Id"]} -- #{s["Description"]}\n"
+    end
+    output += "NumberOfEntries=#{count}"
+    output
+  end
 
 end

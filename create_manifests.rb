@@ -44,6 +44,11 @@ audio_dirs.each do |d|
       puts "Created #{filename}!"
     end
   end
+  # (Re)Create a .pls playlist file in each audio dir
+  filename = "#{d.path}/#{d.playlist}"
+  if File.open(filename, 'w') {|f| f.write(d.generate_playlist) }
+    puts "Created #{filename}!"
+  end
 end
 
 puts "Location: #{location.path}"

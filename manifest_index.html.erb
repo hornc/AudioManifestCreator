@@ -39,6 +39,7 @@
 <% directories.each do |dir| -%>
   <%- full_manifest_path = "#{dir.path}/#{dir.manifest}" -%>
   <h3><a name='<%= dir.path %>'><%= dir.path %></a></h3>
+  <b>Playlist:</b> <a href='<%= "#{dir.path}/#{dir.playlist}" %>'><%= dir.playlist %></a><br/>
   <b>Location:</b> <a href='<%= dir.path %>'><%= dir.path %></a><br/>
   <b>Manifest:</b> <a href='<%= full_manifest_path %>'><%= dir.manifest %></a><br/>
   <b>Manifest Last Modified:</b> <%= File.mtime(full_manifest_path) %>
