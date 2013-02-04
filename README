@@ -1,4 +1,3 @@
-
 Audio Manifest Creator
 
 This app searches the current and one level of subdirectories for audio files (currently .WAV and .MP3) and audio file manifests in .CSV format.
@@ -26,7 +25,7 @@ Analyzes an audio file and provides information about its length and format. Cur
 
 TODO:
 
-Remove logic from manifest_index.html.erb and create and controller script
+Remove logic from manifest_index.html.erb
 Add support for parsing Mpeg4 audio, .ogg, .au
 
 
