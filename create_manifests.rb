@@ -11,7 +11,7 @@ require 'ostruct'
 #
 
 def generate_index(location, directories)
-  index_template = ERB.new File.new("#{SCRIPT_LOCATION}/manifest_index.html.erb").read, nil, "-"
+  index_template = ERB.new File.new("#{SCRIPT_LOCATION}/templates/manifest_index.html.erb").read, nil, "-"
   vars = OpenStruct.new :location => location, :directories => directories
   doc = index_template.result(vars.send(:binding))
 end

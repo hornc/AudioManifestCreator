@@ -76,7 +76,7 @@ class AudioDir < Dir
   end
 
   def generate_manifest
-    manifest_template = ERB.new File.new("#{File.expand_path(File.dirname(__FILE__))}/audio_manifest.csv.erb").read, nil, "-"
+    manifest_template = ERB.new File.new("#{File.expand_path(File.dirname(__FILE__))}/templates/audio_manifest.csv.erb").read, nil, "-"
     samples = []
     self.samples.each do |s|
       s = "#{self.path}/#{s}"
